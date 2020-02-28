@@ -1,0 +1,31 @@
+drop procedure pa_calculo_cuota
+
+DELIMITER //
+CREATE PROCEDURE pa_calculo_cuota(pa_meses_pago, pa_tasa_interes, pa_cuota_asignada, pa_dia_pago, pa_estado)
+BEGIN
+insert into contratos(meses_pago, tasa_interes, cuota_asignada, dia_pago, estado)
+-- Precio 
+set @precio = (Select v.precio from contratos c
+inner join solicitudes s on  c.id_solicitud = s.id_solicitud 
+inner join ventas ve on s.id_venta = ve.id_venta
+inner join detalle_ventas dv on ve.id_venta = dv.id_venta
+inner join vehiculos v on dv.id_vehiculo = v.id_vehiculo);
+-- cantidad de vehiculos 
+set @totalVehiculos = (Select dv.cantidad from contratos c
+inner join solicitudes s on c.id_solicitud = s.id_solicitud
+inner join ventas ve on s.id_venta = ve.id_venta
+inner join detalle_ventas dv on dv.id_venta = ve.id_venta);
+-- Total 
+set @total = (Select dv.total from contratos c
+inner join solicitudes s on c.id_solicitud = s.id_solicitud
+inner join ventas ve on s.id_venta = ve.id_venta
+inner join detalle_ventas dv on dv.id_venta = ve.id_venta);
+-- meses de pago 
+set @mes = (Select c.meses_pago from contratos c);
+-- tasa de interes 
+set @tasa = (select c.tasa_interes from contratos c);
+END //
+DELIMITER ;
+
+
+
