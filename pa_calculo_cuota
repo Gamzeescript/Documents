@@ -1,5 +1,9 @@
 drop procedure pa_calculo_cuota
 
+-- procedimiento almacenado que asigna la cuota basado en esta formula
+-- de matematica financiera
+-- a=(precio del carro)[(i/m)(1+(i/m))/(((1+(i/m))^nm)-1)]
+
 DELIMITER //
 CREATE PROCEDURE pa_calculo_cuota(pa_meses_pago, pa_tasa_interes, pa_cuota_asignada, pa_dia_pago, pa_estado)
 BEGIN
@@ -24,8 +28,19 @@ inner join detalle_ventas dv on dv.id_venta = ve.id_venta);
 set @mes = (Select c.meses_pago from contratos c);
 -- tasa de interes 
 set @tasa = (select c.tasa_interes from contratos c);
+-- primer calculo 
+set @primero = 1 + (@tasa/12)
+-- segundo calculo 
+set @segundopow = Select POW(@primero,@mes);
+-- tercer calculo 
+set @calculotasa = @tasa/12;
+-- cuarto calculo 
+set @basecalculo = @segundopow - 1;
+-- ultimo calculo 
+set @cuotaasignada = @precio * 
 END //
 DELIMITER ;
+
 
 
 
