@@ -1,45 +1,52 @@
-drop procedure pa_calculo_cuota
+drop procedure if exists pa_calculo_cuota;
 
 -- procedimiento almacenado que asigna la cuota basado en esta formula
 -- de matematica financiera
 -- a=(precio del carro)[(i/m)(1+(i/m))/(((1+(i/m))^nm)-1)]
 
 DELIMITER //
-CREATE PROCEDURE pa_calculo_cuota(pa_meses_pago, pa_tasa_interes, pa_cuota_asignada, pa_dia_pago, pa_estado)
+CREATE PROCEDURE pa_calculo_cuota(pa_id_solicitud int, pa_meses_pago int, pa_tasa_interes double, pa_dia_pago int, pa_estado varchar(30))
 BEGIN
-insert into contratos(meses_pago, tasa_interes, cuota_asignada, dia_pago, estado)
+
 -- Precio 
-set @precio = (Select v.precio from contratos c
-inner join solicitudes s on  c.id_solicitud = s.id_solicitud 
-inner join ventas ve on s.id_venta = ve.id_venta
-inner join detalle_ventas dv on ve.id_venta = dv.id_venta
-inner join vehiculos v on dv.id_vehiculo = v.id_vehiculo);
--- cantidad de vehiculos 
-set @totalVehiculos = (Select dv.cantidad from contratos c
-inner join solicitudes s on c.id_solicitud = s.id_solicitud
-inner join ventas ve on s.id_venta = ve.id_venta
-inner join detalle_ventas dv on dv.id_venta = ve.id_venta);
--- Total 
-set @total = (Select dv.total from contratos c
-inner join solicitudes s on c.id_solicitud = s.id_solicitud
-inner join ventas ve on s.id_venta = ve.id_venta
-inner join detalle_ventas dv on dv.id_venta = ve.id_venta);
--- meses de pago 
-set @mes = (Select c.meses_pago from contratos c);
--- tasa de interes 
-set @tasa = (select c.tasa_interes from contratos c);
+set @precio = (Select SUM(dv.total) from solicitudes s
+inner join detalle_ventas dv on s.id_venta = dv.id_venta
+inner join vehiculos v on dv.id_vehiculo = v.id_vehiculo where dv.id_venta=(Select s.id_venta from solicitudes s where s.id_solicitud=pa_id_solicitud) and s.id_solicitud = (Select s.id_solicitud from solicitudes s where s.id_solicitud=pa_id_solicitud));
+-- 
+
+-- precalculo 
+set @tacita = ((pa_tasa_interes/100)/12);
+
 -- primer calculo 
-set @primero = 1 + (@tasa/12)
+set @primero = 1 + @tacita;
 -- segundo calculo 
-set @segundopow = Select POW(@primero,@mes);
--- tercer calculo 
-set @calculotasa = @tasa/12;
+set @powcito = (Select POW(@primero,pa_meses_pago));
+-- tercer calculo pero de tasa entre lo otro 
+set @calculobaseprimera =  @powcito * @tacita; 
 -- cuarto calculo 
-set @basecalculo = @segundopow - 1;
+set @basecalculo = @powcito - 1;
+-- quinto calculo 
+set @quintodivision = @calculobaseprimera / @basecalculo;
 -- ultimo calculo 
-set @cuotaasignada = @precio * 
+set @cuotadefinitiva = @precio * @quintodivision;
+
+select @precio;
+select @totalVehiculos;
+select @total;
+select @primero;
+select @segundopow;
+select @calculotasa;
+SELECT @calculobaseprimera;
+select @basecalculo;
+select @quintodivision;
+select @cuotadefinitiva;
+
+insert into contratos values(pa_id_solicitud, pa_meses_pago, pa_tasa_interes, @cuotadefinitiva, pa_dia_pago, pa_estado);
 END //
 DELIMITER ;
+
+CALL pa_calculo_cuota(32,36,8,19,'vigente');
+
 
 
 
