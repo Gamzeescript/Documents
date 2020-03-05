@@ -1,0 +1,13 @@
+Notificaciones push con JAVA
+
+¿Que son?
+Es una aplicación que permite enviar mensajes desde un servidor a un cliente que consume servicios en tiempo real, usando un formato de notificación de tipo alerta que contiene informaciòn nueva y que se le presenta al usuario incluso cuando no exista interés en esa información.
+
+Utiliza las conexiones APNS y GCM; de Apple y Google respectivamente. Necesita de las librerías Json Web Tokens, tecnologìas de Firebase Cloud Message de google, Mozilla Push Service de Mozilla, proporcionando al desarrollador las herramientas necesarias para la realización de servicios push.
+
+Creaciòn de notificaciones push utilizando JAVA.
+
+
+
+
+
