@@ -1,0 +1,55 @@
+<script type="text/javascript">
+				$(document).ready(function(){
+			        $('select').formSelect();
+			    });
+
+			    
+
+				function validaciones(meses, tasa, dia){
+					var meses = document.getElementById("meses").value ;
+					var tasa = tasadocument.getElementById("tasa").value ;
+					var dia = document.getElementById("dia").value;
+
+					var reg = new RegExp("/^[0-9]+([.][0-9]+)?$/");
+
+					$("#meses".keyup(function(){						
+						if (meses.match(reg)){
+							if((meses => 12) && (meses <=96)){
+								meses == true;
+								}
+						}
+						else {
+							new Toast({
+								  message: 'Los meses de pago deben de ser anual y menor de 96 meses',
+								  type: 'danger'
+								});							
+						}				
+					});
+			
+					
+					$("#tasa".keyup(function(){
+					if((tasa => 8) && (tasa <=15)){
+							tasa ==  true;	
+						}				
+				else {
+					new Toast({
+						  message: 'La tasa debe de estar entre el rango determinado',
+						  type: 'danger'
+					});							
+				}				
+
+					$("#dia".keyup(function(){
+						if((dia => 1) && (dia <=25)){
+							dia == true;							
+						}
+				}
+				else {
+					new Toast({
+						  message: 'El dia de pago debe de estar en el rango de fechas de salario',
+						  type: 'danger'
+					});							
+				}				
+			});
+
+				
+	</script>
